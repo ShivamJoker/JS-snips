@@ -16,6 +16,10 @@ EventEmitter.prototype.emit = function (eventName, payload) {
   this.subscribers[eventName].forEach((fn) => fn(payload));
 };
 
+EventEmitter.prototype.removeListener = function (eventName, fn) {
+  this.subscribers[eventName] = this.subscribers[eventName].filter((_fn) => _fn !== fn);
+};
+
 const exEmitter = new EventEmitter();
 
 exEmitter.on("registered", () => {
@@ -28,14 +32,17 @@ exEmitter.on("registered", () => {
   console.log("gift sent");
 });
 
-exEmitter.on("orderPurchased", (payload) => {
-  // Send generate invoice and mail ti user
-  console.log("Generated receipt of ", payload);
-});
+function generateReceipt(payload) {
+ // Send generate invoice and mail ti user
+ console.log("Generated receipt of ", payload);
+}
+
+exEmitter.on("orderPurchased",generateReceipt);
 
 // register.js
+// Remove listener
+exEmitter.removeListener("orderPurchased", generateReceipt);
 
 // register logic.
-
 exEmitter.emit("orderPurchased", "JsBoy")
 exEmitter.emit("registered");
